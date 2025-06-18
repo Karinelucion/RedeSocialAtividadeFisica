@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "733936664073",
+    "project_id": "redesocialatividadefisica",
+    "storage_bucket": "redesocialatividadefisica.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733936664073:android:645897cf0c4699a9c342d8",
+        "android_client_info": {
+          "package_name": "com.example.redesocialatividadefisica"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "733936664073-iup5rvketjiia5jg8j46e9b91rnsksva.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.redesocialatividadefisica",
+            "certificate_hash": "d943b3eca0963915b10fdbb516c21cd88e2c3096"
+          }
+        },
+        {
+          "client_id": "733936664073-itnior66a6q43ee8mjjbaoh52qj9q4g5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDr1TSyI4m11JZEaLzP3d_MquBTql29Tg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "733936664073-itnior66a6q43ee8mjjbaoh52qj9q4g5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
