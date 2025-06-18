@@ -10,6 +10,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.common.SignInButton
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun launchCredentialManager(){
         val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(getString(R.string.defaut_web_client_id))
+            .setServerClientId(getString(R.string.default_web_client_id))
             .setFilterByAuthorizedAccounts(false)
             .build()
 
@@ -54,6 +55,8 @@ class MainActivity : AppCompatActivity() {
                     context = this@MainActivity,
                     request = request
                 )
+
+                println(result)
                 handleSignIn(result.credential)
             }catch (e: Exception){
                 Log.e("Erro", "Não foi possível recuperar a credencial do usuário: ${e.localizedMessage}")
