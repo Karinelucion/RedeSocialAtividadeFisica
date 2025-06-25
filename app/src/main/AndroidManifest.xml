@@ -23,6 +23,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
+        <activity android:name=".HomeActivity" />
+        <activity android:name=".RankingFragment" />
+        <activity android:name=".GruposFragment" />
+        <activity android:name=".CadastroGrupoActivity" />
     </application>
 
 </manifest>

@@ -1,5 +1,7 @@
 package com.example.redesocialatividadefisica
 
+import UsuarioDBHelper
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,7 +12,6 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.common.SignInButton
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
@@ -24,13 +25,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var credentialManager: CredentialManager
+    private lateinit var usuarioDBHelper: UsuarioDBHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         auth = Firebase.auth
-
         credentialManager = CredentialManager.create(this)
+        usuarioDBHelper = UsuarioDBHelper(this)
 
         setContentView(R.layout.activity_main)
     }
@@ -79,11 +81,23 @@ class MainActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this){ task ->
                 if(task.isSuccessful){
-                    Log.d("Erro", "signInWithCredential:success")
-                    val email = auth.currentUser?.email
                     val user = auth.currentUser
-                    Toast.makeText(this, "Usuário: $email - $user", Toast.LENGTH_SHORT).show()
-                }else{
+                    val email = user?.email ?: ""
+                    val uid = user?.uid ?: ""
+                    val displayName = user?.displayName ?: ""
+
+                    val cadastrado = usuarioDBHelper.inserirUsuario(uid, email, displayName)
+
+                    if (cadastrado) {
+                        Toast.makeText(this, "Usuário cadastrado localmente", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Usuário já cadastrado localmente", Toast.LENGTH_SHORT).show()
+                    }
+
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
                     Log.w("Erro", "signInWithCredential:failure", task.exception)
                 }
             }
