@@ -28,5 +28,4 @@
         <activity android:name=".GruposFragment" />
         <activity android:name=".CadastroGrupoActivity" />
     </application>
-
 </manifest>
