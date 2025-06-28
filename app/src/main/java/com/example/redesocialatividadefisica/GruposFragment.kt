@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class GruposFragment : Fragment() {
 
@@ -21,7 +22,7 @@ class GruposFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val btnNovoGrupo = view.findViewById<Button>(R.id.btnNovoGrupo)
+        val btnNovoGrupo = view.findViewById<FloatingActionButton>(R.id.btnNovoGrupo)
         btnNovoGrupo.setOnClickListener {
             startActivity(Intent(requireContext(), CadastroGrupoActivity::class.java))
         }
