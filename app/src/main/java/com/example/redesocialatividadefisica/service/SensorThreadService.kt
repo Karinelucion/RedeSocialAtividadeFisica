@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -12,7 +13,9 @@ import android.hardware.SensorManager
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.redesocialatividadefisica.R
 import kotlin.math.pow
@@ -20,83 +23,119 @@ import kotlin.math.sqrt
 
 
 class SensorThreadService : Service(), SensorEventListener {
+    // Binder para comunicação
     inner class LocalBinder : Binder() {
         fun getService(): SensorThreadService = this@SensorThreadService
     }
+
+    private val binder = LocalBinder()
     private lateinit var sensorManager: SensorManager
-    private val _sensorData = MutableLiveData<Float>()
+    private var accelerometer: Sensor? = null
+
+    // LiveData para transmissão dos valores
+    private val _sensorLiveData = MutableLiveData<Float>()
+    val sensorLiveData: LiveData<Float> get() = _sensorLiveData
+
+    // Dados para cálculo da média
     private val collectedValues = mutableListOf<Float>()
     private val lock = Any()
-    private var sum = 0.0
-    private var count = 0
-    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onCreate() {
         super.onCreate()
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService()
-        } else {
-            startForeground(1, Notification())
-        }
-        startSensorCollection()
+        startForegroundService() // DEVE ser a PRIMEIRA chamada
+        initSensor()
     }
 
     private fun startForegroundService() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel(
-                "sensor_channel",
-                "Monitoramento de Movimento",
-                NotificationManager.IMPORTANCE_LOW
-            ).also { channel ->
-                (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
-                    .createNotificationChannel(channel)
+        try {
+            // 1. Crie o canal (Android 8+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel(
+                    "sensor_channel",
+                    "Monitoramento",
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+                        .createNotificationChannel(this)
+                }
             }
+
+            // 2. Crie a notificação MÍNIMA
+            val notification = NotificationCompat.Builder(this, "sensor_channel")
+                .setContentTitle("Monitoramento Ativo")
+                .setContentText("Coletando dados de movimento")
+                .setSmallIcon(R.drawable.ic_launcher_foreground) // ÍCONE OBRIGATÓRIO!
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build()
+
+            // 3. Inicie como foreground service
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                startForeground(1, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+            } else {
+                startForeground(1, notification)
+            }
+        } catch (e: Exception) {
+            Log.e("SensorService", "Erro no foreground", e)
+            stopSelf() // Encerra se falhar
         }
-
-        val notification = NotificationCompat.Builder(this, "sensor_channel")
-            .setContentTitle("")
-            .setContentText("")
-            .setSmallIcon(android.R.color.transparent)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
-            .build()
-
-        startForeground(1, notification)
     }
 
-    private fun startSensorCollection() {
-        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.let {
-            sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_NORMAL)
+    private fun initSensor() {
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)?.let { sensor ->
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+        } ?: run {
+            stopSelf() // Encerra se não houver sensor
         }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Garante que o serviço reinicie se for encerrado
+        return START_STICKY
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
-            val magnitude = sqrt(it.values[0].pow(2) + it.values[1].pow(2) + it.values[2].pow(2))
+            val x = it.values[0]
+            val y = it.values[1]
+            val z = it.values[2]
+            val magnitude = sqrt(x * x + y * y + z * z.toDouble()).toFloat()
 
+            // Atualiza LiveData
+            _sensorLiveData.postValue(magnitude)
+
+            // Armazena para cálculo da média
             synchronized(lock) {
-                sum += magnitude
-                count++
-                collectedValues.add(magnitude.toFloat())
+                collectedValues.add(magnitude)
             }
-
-            _sensorData.postValue(magnitude.toFloat())
         }
     }
 
-    fun stopMonitoring() {
-        sensorManager.unregisterListener(this)
-        stopSelf()
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+        // TODO : Nao é necessario implemetação
     }
 
-    fun getFinalAverage(): Float = synchronized(lock) {
-        if (count == 0) 0f else (sum / count).toFloat()
+    fun getFinalAverage(): Float {
+        return synchronized(lock) {
+            if (collectedValues.isEmpty()) 0f else collectedValues.average().toFloat()
+        }
     }
 
     override fun onDestroy() {
-        sensorManager.unregisterListener(this)
-        super.onDestroy()
-    }
+        try {
+            // 1. Pare a coleta de dados do sensor
+            sensorManager.unregisterListener(this)
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+            // 3. Pare completamente o serviço
+            stopSelf()
+
+        } catch (e: Exception) {
+            Log.e("SensorService", "Erro ao destruir serviço", e)
+        } finally {
+            super.onDestroy()
+        }
+    }
 }

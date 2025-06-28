@@ -38,9 +38,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun btLoginOnClick(view: View) {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-//        launchCredentialManager()
+        launchCredentialManager()
     }
 
     private fun launchCredentialManager(){

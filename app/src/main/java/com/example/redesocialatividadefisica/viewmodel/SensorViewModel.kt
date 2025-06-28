@@ -6,10 +6,11 @@ import androidx.lifecycle.ViewModel
 
 class SensorViewModel : ViewModel() {
     private val _currentValue = MutableLiveData<Float>()
-    val currentValue: LiveData<Float> = _currentValue
+    val currentValue: LiveData<Float> get() = _currentValue
 
+    // Armazena a média final
     private val _finalAverage = MutableLiveData<Float>()
-    val finalAverage: LiveData<Float> = _finalAverage
+    val finalAverage: LiveData<Float> get() = _finalAverage
 
     fun updateCurrentValue(value: Float) {
         _currentValue.postValue(value)
