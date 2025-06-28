@@ -1,9 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.RedeSocialAtividadeFisica" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-    </style>
+    <style name="Theme.RedeSocialAtividadeFisica" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Cor de fundo principal da tela -->
+        <item name="android:colorBackground">@color/colorBackground</item>
 
-    <style name="Theme.RedeSocialAtividadeFisica" parent="Base.Theme.RedeSocialAtividadeFisica" />
+        <!-- Cor primária (barras, botões, etc) -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Cor secundária ou detalhes (ex: botão de ação, links) -->
+        <item name="colorSecondary">@color/colorDetails</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Cores padrão para textos e ícones -->
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/colorDetails</item>
+
+        <!-- Controle de fundo dos componentes -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
+    </style>
 </resources>
