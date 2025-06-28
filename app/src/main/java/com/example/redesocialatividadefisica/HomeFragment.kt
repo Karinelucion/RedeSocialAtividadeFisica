@@ -12,14 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
 import com.example.redesocialatividadefisica.viewmodel.SensorViewModel
 import com.example.redesocialatividadefisica.databinding.FragmentHomeBinding
 import com.example.redesocialatividadefisica.service.SensorThreadService
 import com.google.firebase.auth.FirebaseAuth
-import java.util.Locale
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
