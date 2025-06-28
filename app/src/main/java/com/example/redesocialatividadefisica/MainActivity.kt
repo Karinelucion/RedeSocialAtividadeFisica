@@ -12,6 +12,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.lifecycle.lifecycleScope
+import com.example.redesocialatividadefisica.helpers.UsuarioFirestoreHelper
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
@@ -86,13 +87,22 @@ class MainActivity : AppCompatActivity() {
                     val uid = user?.uid ?: ""
                     val displayName = user?.displayName ?: ""
 
-                    val cadastrado = usuarioDBHelper.inserirUsuario(uid, email, displayName)
-
-                    if (cadastrado) {
-                        Toast.makeText(this, "Usuário cadastrado localmente", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, "Usuário já cadastrado localmente", Toast.LENGTH_SHORT).show()
+                    if (user != null) {
+                        UsuarioFirestoreHelper.salvarUsuario(
+                            user,
+                            onSuccess = { Toast.makeText(this, "Usuário cadastrado com sucesso!", Toast.LENGTH_SHORT).show() },
+                            onFailure = { Toast.makeText(this, "Erro ao cadastrar usuário!", Toast.LENGTH_SHORT).show() },
+                            onAlreadyExists = { Toast.makeText(this, "Autenticado com sucesso!", Toast.LENGTH_SHORT).show() }
+                        )
                     }
+
+//                    val cadastrado = usuarioDBHelper.inserirUsuario(uid, email, displayName)
+
+//                    if (cadastrado) {
+//                        Toast.makeText(this, "Usuário cadastrado localmente", Toast.LENGTH_SHORT).show()
+//                    } else {
+//                        Toast.makeText(this, "Usuário já cadastrado localmente", Toast.LENGTH_SHORT).show()
+//                    }
 
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)

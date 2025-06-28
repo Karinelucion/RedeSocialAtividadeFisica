@@ -10,12 +10,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 
 import com.example.redesocialatividadefisica.viewmodel.SensorViewModel
 import com.example.redesocialatividadefisica.databinding.FragmentHomeBinding
+import com.example.redesocialatividadefisica.helpers.AtividadeFirestoreHelper
 import com.example.redesocialatividadefisica.service.SensorThreadService
 import com.google.firebase.auth.FirebaseAuth
 
@@ -95,6 +97,17 @@ class HomeFragment : Fragment() {
             binding.btnMonitor.text = "Iniciar Monitoramento"
             val average = service?.getFinalAverage() ?: 0f
             binding.txtNivelMovimento.text = "Nível de movimento médio: %.2f".format(average)
+
+            val user = auth.currentUser
+            if (user != null) {
+                AtividadeFirestoreHelper.salvarAtividade(
+                    user,
+                    average,
+                    onSuccess = { Toast.makeText(requireContext(), "Atividade registrada com sucesso!", Toast.LENGTH_SHORT).show() },
+                    onFailure = { Toast.makeText(requireContext(), "Erro ao registrar atividade!", Toast.LENGTH_SHORT).show() },
+                )
+            }
+
         } catch (e: Exception) {
             Log.e("HomeFragment", "Erro ao parar monitoramento", e)
         }
