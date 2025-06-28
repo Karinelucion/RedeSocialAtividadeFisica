@@ -14,11 +14,15 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.redesocialatividadefisica.adapters.AtividadeHistoricoAdapter
 
 import com.example.redesocialatividadefisica.viewmodel.SensorViewModel
 import com.example.redesocialatividadefisica.databinding.FragmentHomeBinding
 import com.example.redesocialatividadefisica.helpers.AtividadeFirestoreHelper
+import com.example.redesocialatividadefisica.model.Atividade
 import com.example.redesocialatividadefisica.service.SensorThreadService
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 
 class HomeFragment : Fragment() {
@@ -69,8 +73,23 @@ class HomeFragment : Fragment() {
                 startMonitoring()
             }
         }
-    }
 
+        auth.currentUser?.uid?.let { uid ->
+            AtividadeFirestoreHelper.buscarAtividades(uid,
+                onResult = { lista ->
+                    val atividades = lista.map {
+                        Atividade(
+                            datahora = it["datahora"] as Timestamp,
+                            nivelAceleracaoMedia = (it["nivelAceleracaoMedia"] as? Double)?.toFloat() ?: 0f
+                        )
+                    }
+
+                    binding.recyclerHistorico.layoutManager = LinearLayoutManager(requireContext())
+                    binding.recyclerHistorico.adapter = AtividadeHistoricoAdapter(atividades)
+                }
+            )
+        }
+    }
 
     private fun startMonitoring() {
         val serviceIntent = Intent(requireContext(), SensorThreadService::class.java)

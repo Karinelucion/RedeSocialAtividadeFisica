@@ -13,13 +13,13 @@ object AtividadeFirestoreHelper {
     // Gravar nova atividade para o usuário
     fun salvarAtividade(
         user: FirebaseUser,
-        aceleracaoMedia: Float,
+        nivelAceleracaoMedia: Float,
         onSuccess: () -> Unit = {},
         onFailure: (Exception) -> Unit = {}
     ) {
         val atividade = hashMapOf(
             "datahora" to Timestamp.now(),
-            "nivelAceleracaoMedia" to aceleracaoMedia
+            "nivelAceleracaoMedia" to nivelAceleracaoMedia
         )
 
         firestore.collection("usuarios")
@@ -45,11 +45,12 @@ object AtividadeFirestoreHelper {
         firestore.collection("usuarios")
             .document(uid)
             .collection("atividades")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .orderBy("datahora", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 val lista = result.mapNotNull { it.data }
                 onResult(lista)
+                Log.d("Firestore", "Sucesso ao buscar atividades ${lista}")
             }
             .addOnFailureListener {
                 Log.e("Firestore", "Erro ao buscar atividades", it)
