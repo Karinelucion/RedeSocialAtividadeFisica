@@ -39,6 +39,7 @@ class AtividadeHistoricoAdapter(private val lista: List<Atividade>) :
         holder.txtValor.text = valorFormatado
     }
 
+
     override fun getItemCount(): Int = lista.size
 
 }
