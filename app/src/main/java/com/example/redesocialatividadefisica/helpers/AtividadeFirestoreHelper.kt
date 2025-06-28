@@ -1,6 +1,7 @@
 package com.example.redesocialatividadefisica.helpers
 
 import android.util.Log
+import com.example.redesocialatividadefisica.model.RankingItem
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -56,5 +57,54 @@ object AtividadeFirestoreHelper {
                 Log.e("Firestore", "Erro ao buscar atividades", it)
                 onFailure(it)
             }
+    }
+
+    fun buscarRanking(
+        onResult: (List<RankingItem>) -> Unit,
+        onFailure: (Exception) -> Unit = {}
+    ) {
+        val rankingList = mutableListOf<RankingItem>()
+
+        firestore.collection("usuarios").get()
+            .addOnSuccessListener { usuarios ->
+                if (usuarios.isEmpty) {
+                    onResult(emptyList())
+                    return@addOnSuccessListener
+                }
+
+                var restantes = usuarios.size()
+
+                for (usuarioDoc in usuarios) {
+                    val uid = usuarioDoc.id
+                    val nome = usuarioDoc.getString("nome") ?: "Usuário"
+
+                    firestore.collection("usuarios")
+                        .document(uid)
+                        .collection("atividades")
+                        .orderBy("nivelAceleracaoMedia", Query.Direction.DESCENDING)
+                        .limit(1)
+                        .get()
+                        .addOnSuccessListener { atividades ->
+                            val top = atividades.firstOrNull()
+                            val media = (top?.get("nivelAceleracaoMedia") as? Double)?.toFloat() ?: 0f
+
+                            rankingList.add(RankingItem(nome, media))
+
+                            restantes--
+                            if (restantes == 0) {
+                                val ordenado = rankingList.sortedByDescending { it.aceleracaoMaxima }
+                                onResult(ordenado)
+                            }
+                        }
+                        .addOnFailureListener {
+                            restantes--
+                            if (restantes == 0) {
+                                val ordenado = rankingList.sortedByDescending { it.aceleracaoMaxima }
+                                onResult(ordenado)
+                            }
+                        }
+                }
+            }
+            .addOnFailureListener(onFailure)
     }
 }
