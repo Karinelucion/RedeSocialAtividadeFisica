@@ -35,14 +35,6 @@
         android:layout_marginHorizontal="16dp"
         android:hint="Digite o nome do grupo" />
 
-    <!-- Botão para adicionar pessoa -->
-    <Button
-        android:id="@+id/btnAdicionarPessoa"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="Adicionar Pessoa" />
-
     <!-- Lista de pessoas adicionadas -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerPessoas"

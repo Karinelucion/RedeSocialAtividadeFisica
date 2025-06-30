@@ -5,4 +5,7 @@
     <color name="colorPrimary">#224759</color>
     <color name="colorBackground">#dbdbdb</color>
     <color name="colorDetails">#05294a</color>
+    <color name="yellow">#AF7103</color>
+    <color name="red">#8A0B02</color>
+    <color name="green">#2F4934</color>
 </resources>
