@@ -27,12 +27,14 @@
         android:strokeColor="@android:color/darker_gray"
         android:text="Entrar com o Google"
         android:textColor="@android:color/black"
-        app:icon="@drawable/ic_google_logo"
+        app:icon="@drawable/ic_google"
+        app:iconTint="@color/colorPrimary"
         app:iconGravity="textStart"
         app:iconPadding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/splash_logo"
-        android:layout_marginTop="60dp"/>
+        android:layout_marginTop="60dp"
+        app:iconSize="24dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

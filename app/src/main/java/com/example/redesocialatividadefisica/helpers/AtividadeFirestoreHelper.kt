@@ -107,4 +107,74 @@ object AtividadeFirestoreHelper {
             }
             .addOnFailureListener(onFailure)
     }
+
+    fun buscarRankingDoGrupo(
+        grupoId: String,
+        onResult: (List<RankingItem>) -> Unit,
+        onFailure: (Exception) -> Unit = {}
+    ) {
+        val firestore = FirebaseFirestore.getInstance()
+        val rankingList = mutableListOf<RankingItem>()
+
+        // Primeiro, buscar o grupo para obter a lista de membros
+        firestore.collection("grupos")
+            .document(grupoId)
+            .get()
+            .addOnSuccessListener { grupoDoc ->
+                val membros = grupoDoc.get("membros") as? List<String> ?: emptyList()
+
+                if (membros.isEmpty()) {
+                    onResult(emptyList())
+                    return@addOnSuccessListener
+                }
+
+                var restantes = membros.size
+
+                for (uid in membros) {
+                    firestore.collection("usuarios")
+                        .document(uid)
+                        .get()
+                        .addOnSuccessListener { usuarioDoc ->
+                            val nome = usuarioDoc.getString("nome") ?: "Usuário"
+
+                            // Buscar a melhor atividade desse usuário
+                            firestore.collection("usuarios")
+                                .document(uid)
+                                .collection("atividades")
+                                .orderBy("nivelAceleracaoMedia", Query.Direction.DESCENDING)
+                                .limit(1)
+                                .get()
+                                .addOnSuccessListener { atividades ->
+                                    val top = atividades.firstOrNull()
+                                    val media = (top?.get("nivelAceleracaoMedia") as? Double)?.toFloat() ?: 0f
+
+                                    rankingList.add(RankingItem(nome, media))
+
+                                    restantes--
+                                    if (restantes == 0) {
+                                        val ordenado = rankingList.sortedByDescending { it.aceleracaoMaxima }
+                                        onResult(ordenado)
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    restantes--
+                                    if (restantes == 0) {
+                                        val ordenado = rankingList.sortedByDescending { it.aceleracaoMaxima }
+                                        onResult(ordenado)
+                                    }
+                                }
+
+                        }
+                        .addOnFailureListener {
+                            restantes--
+                            if (restantes == 0) {
+                                val ordenado = rankingList.sortedByDescending { it.aceleracaoMaxima }
+                                onResult(ordenado)
+                            }
+                        }
+                }
+            }
+            .addOnFailureListener(onFailure)
+    }
+
 }

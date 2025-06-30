@@ -1,21 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp"
     android:orientation="horizontal">
 
     <TextView
-        android:id="@+id/txtNomePessoa"
+        android:id="@+id/txtNomeGrupo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Nome da Pessoa"
+        android:text="Nome do grupo"
         android:textSize="16sp" />
 
-    <Button
-        android:id="@+id/btnRemover"
+    <ImageButton
+        android:id="@+id/btnEditar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Remover" />
+        android:contentDescription="Editar grupo"
+        android:src="@drawable/ic_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="@color/yellow"
+        android:layout_marginEnd="20dp"/>
+
+    <ImageButton
+        android:id="@+id/btnExcluir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Excluir grupo"
+        android:src="@drawable/ic_trash"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="@color/red"/>
+
 </LinearLayout>

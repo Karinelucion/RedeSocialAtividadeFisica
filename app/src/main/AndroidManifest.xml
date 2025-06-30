@@ -30,6 +30,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".HomeActivity" />
         <activity android:name=".CadastroGrupoActivity" />
+        <activity android:name=".RankingGrupoActivity" />
 
         <service
             android:name=".service.SensorThreadService"
