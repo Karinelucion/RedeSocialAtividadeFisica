@@ -122,7 +122,9 @@ class HomeFragment : Fragment() {
                 AtividadeFirestoreHelper.salvarAtividade(
                     user,
                     average,
-                    onSuccess = { Toast.makeText(requireContext(), "Atividade registrada com sucesso!", Toast.LENGTH_SHORT).show() },
+                    onSuccess = {
+                        Toast.makeText(requireContext(), "Atividade registrada com sucesso!", Toast.LENGTH_SHORT).show()
+                        carregarHistorico()},
                     onFailure = { Toast.makeText(requireContext(), "Erro ao registrar atividade!", Toast.LENGTH_SHORT).show() },
                 )
             }
@@ -137,6 +139,23 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         if (isBound) {
             requireActivity().unbindService(connection)
+        }
+    }
+
+    private fun carregarHistorico() {
+        auth.currentUser?.uid?.let { uid ->
+            AtividadeFirestoreHelper.buscarAtividades(uid,
+                onResult = { lista ->
+                    val atividades = lista.map {
+                        Atividade(
+                            datahora = it["datahora"] as Timestamp,
+                            nivelAceleracaoMedia = (it["nivelAceleracaoMedia"] as? Double)?.toFloat() ?: 0f
+                        )
+                    }
+                    binding.recyclerHistorico.layoutManager = LinearLayoutManager(requireContext())
+                    binding.recyclerHistorico.adapter = AtividadeHistoricoAdapter(atividades)
+                }
+            )
         }
     }
 }

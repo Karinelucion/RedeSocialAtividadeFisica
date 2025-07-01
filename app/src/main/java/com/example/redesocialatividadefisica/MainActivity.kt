@@ -96,14 +96,6 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
 
-//                    val cadastrado = usuarioDBHelper.inserirUsuario(uid, email, displayName)
-
-//                    if (cadastrado) {
-//                        Toast.makeText(this, "Usuário cadastrado localmente", Toast.LENGTH_SHORT).show()
-//                    } else {
-//                        Toast.makeText(this, "Usuário já cadastrado localmente", Toast.LENGTH_SHORT).show()
-//                    }
-
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                     finish()

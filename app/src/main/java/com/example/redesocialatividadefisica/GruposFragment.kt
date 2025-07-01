@@ -32,6 +32,11 @@ class GruposFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_grupos, container, false)
     }
 
+    override fun onResume() {
+        super.onResume()
+        carregarGrupos()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
