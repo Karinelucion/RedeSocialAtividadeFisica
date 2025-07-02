@@ -30,7 +30,6 @@ class SensorThreadService : Service(), SensorEventListener {
 
     private val binder = LocalBinder()
     private lateinit var sensorManager: SensorManager
-    private var accelerometer: Sensor? = null
 
     // LiveData para transmissão dos valores
     private val _sensorLiveData = MutableLiveData<Float>()
@@ -44,13 +43,12 @@ class SensorThreadService : Service(), SensorEventListener {
 
     override fun onCreate() {
         super.onCreate()
-        startForegroundService() // DEVE ser a PRIMEIRA chamada
+        startForegroundService()
         initSensor()
     }
 
     private fun startForegroundService() {
         try {
-            // 1. Crie o canal (Android 8+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel(
                     "sensor_channel",
@@ -62,15 +60,13 @@ class SensorThreadService : Service(), SensorEventListener {
                 }
             }
 
-            // 2. Crie a notificação MÍNIMA
             val notification = NotificationCompat.Builder(this, "sensor_channel")
                 .setContentTitle("Monitoramento Ativo")
                 .setContentText("Coletando dados de movimento")
-                .setSmallIcon(R.drawable.ic_launcher_foreground) // ÍCONE OBRIGATÓRIO!
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build()
 
-            // 3. Inicie como foreground service
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 startForeground(1, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
             } else {
@@ -92,7 +88,6 @@ class SensorThreadService : Service(), SensorEventListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Garante que o serviço reinicie se for encerrado
         return START_STICKY
     }
 
@@ -125,11 +120,8 @@ class SensorThreadService : Service(), SensorEventListener {
 
     override fun onDestroy() {
         try {
-            // 1. Pare a coleta de dados do sensor
             sensorManager.unregisterListener(this)
 
-
-            // 3. Pare completamente o serviço
             stopSelf()
 
         } catch (e: Exception) {
